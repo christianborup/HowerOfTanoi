@@ -1,0 +1,396 @@
+#Making a Grapher
+
+#Import and set up variables
+
+import pygame, math, sys
+from pygame import *
+from math import *
+pygame.init()
+
+
+font = pygame.font.SysFont('Verdana',16)
+font2 = pygame.font.SysFont('Serif',24)
+font3 = pygame.font.SysFont("Arial",12)
+white = (255, 255, 255)
+black = (0,0,0)
+graphColour = (200,0,200)  #RGB #Purple
+gridcolour = (100,250,240)  #light blue
+titlecolour = (200,0,150) #Darker purple
+
+width,height = 600, 600
+extraW = 400
+screen = pygame.display.set_mode((width+extraW,height))
+pygame.display.set_caption("My own personal grapher")
+
+
+
+def frontPage():
+    screen.set_clip(0,0, width+extraW, height)
+    screen.fill(white)
+    screen.set_clip(None)
+
+
+    title = font2.render("Welcome to Christian's mulitpurpose calculator", 1, titlecolour)
+    screen.blit(title, (width/2, 10))
+    instruct = font.render("If you wish to draw a graph of a given equation please select 'g'. ", 1, black)
+    screen.blit(instruct, (30, 50))
+    instruct = font.render("If you wish to differentiate a given polynomial please select 'd'. ", 1, black)
+    screen.blit(instruct,(30, 80))
+    instruct = font.render("If you wish to indefinitiely a given polynomial please select 'i'. ", 1, black)
+    screen.blit(instruct, (30, 110))
+    instruct = font.render("If you wish to approximate the definite integral for a given equation please select 'a'. ", 1, black)
+    screen.blit(instruct, (30, 140))
+
+
+    cont = True
+
+    while cont:
+        pygame.display.update()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                cont = False
+                done = True
+            elif event.type == pygame.KEYDOWN:
+
+                if event.key == K_g:
+                    myGraph()
+                #elif event.key ==  K_d:
+                 #   myDif()
+                #elif event.key == K_i:
+                 #   myInt()
+    
+    pygame.quit()
+    sys.exit()
+                
+
+
+
+#Graph paper function
+def graphPaper(k):
+
+    screen.set_clip(0,0,width+extraW,height)
+    screen.fill(white)
+
+    #draw graph paper
+    for i in range(width//k):
+        gridx = k*i
+        gridy = k*i
+
+        pygame.draw.line(screen, gridcolour, (gridx,0), (gridx,height), 1)
+        pygame.draw.line(screen, gridcolour, (0,gridy), (width,gridy), 1)
+
+        #Extra thick line 
+        pygame.draw.line(screen, gridcolour, (width,0), (width,height), 5)
+
+        # x and y axis
+        midx, midy = width //2 , height // 2
+        pygame.draw.line(screen, black, (midx,0), (midx,height), 3)
+        pygame.draw.line(screen, black, (0,midy), (width,midy), 3)
+
+    #clip reset to all the window
+    screen.set_clip(None)
+    
+
+
+#The main function that runs the program
+def myGraph():
+
+    #pixels per unit grid, always use value of k thaqt is a factor of width and height
+    k = 25
+    graphPaper(k)
+
+    #instruction and results
+    title = font2.render("Guess what type of pencil I used", 1, titlecolour)
+    screen.blit(title, (width + 10, 20))
+
+    instruct = font.render("Please enter your equation", 1, black)
+    screen.blit(instruct, (width + 10, 70))
+
+    instruct = font.render("Select 'enter' when done or 'q' to start over. ", 1, black)
+    screen.blit(instruct, (width + 10, 100))
+
+    instruct = font.render("Select 'Backspace' to clear. ", 1, black)
+    screen.blit(instruct, (width + 10, 130))
+
+    instruct = font3.render("s=sin(), c=cos(), t=tan(), r = sqrt(), a = abs(), l=log10(), n=ln(), e=e, p=pi", 1, black)
+    screen.blit(instruct, (width+10, 160))
+
+    # tart an array that will hold equation
+    equation = []
+    done = False
+
+    #active loop
+    active = True
+    while active:
+        #Update the screen
+        screen.set_clip(width+10, height-30, width+extraW, height)
+        screen.fill(white)
+
+        #join equation array without commas
+        eq = " ".join(equation)
+        eq = str.replace(eq, " ","")
+
+        #render in the equation
+        eqshow = font.render("Function: y ="+eq, 1, titlecolour)
+        screen.blit(eqshow,(width+10,height-30))
+
+
+        pygame.display.update()
+
+        #Keyboard and mouse actions
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                active = False
+                done = True
+            
+            
+            elif event.type == pygame.KEYDOWN:
+
+                if event.unicode == u'*':
+                    equation.append("*")
+                elif event.unicode == u'+':
+                    equation.append("+")
+                elif event.unicode == u'/':
+                    equation.append("/")
+                elif event.unicode == u'-':
+                    equation.append("-")
+                elif event.unicode == u'.':
+                    equation.append(".")
+                elif event.unicode == u'(':
+                    equation.append("(")
+                elif event.unicode == u')':
+                    equation.append(")")
+                elif event.unicode == u'^':
+                    equation.append("**")
+                
+                
+
+
+
+                
+                # numbers typed in for equation and the x variable
+                elif event.key == K_1:
+                    equation.append("1")
+                elif event.key == K_2:
+                    equation.append("2")
+                elif event.key == K_3:
+                    equation.append("3")
+                elif event.key == K_4:
+                    equation.append("4")
+                elif event.key == K_5:
+                    equation.append("5")
+                elif event.key == K_6:
+                    equation.append("6")
+                elif event.key == K_7:
+                    equation.append("7")
+                elif event.key == K_8:
+                    equation.append("8")
+                elif event.key == K_9:
+                    equation.append("9")
+                elif event.key == K_0:
+                    equation.append("0")
+                
+                # math function commands
+                elif event.key == K_s:
+                    equation.append("sin(")
+                elif event.key == K_c:
+                    equation.append("cos(")
+                elif event.key == K_t:
+                    equation.append("tan(")
+                elif event.key == K_a:
+                    equation.append("abs(")
+                elif event.key == K_r:
+                    equation.append("sqrt(")
+                elif event.key == K_l:
+                    equation.append("log10(")
+                elif event.key == K_n:
+                    equation.append("log(")
+                elif event.key == K_e:
+                    equation.append("e")
+                elif event.key == K_p:
+                    equation.append("pi")
+
+                elif event.key == K_x:
+                    equation.append("x")
+                elif event.key == K_BACKSPACE and equation !=[]:
+                    equation.pop()
+                
+                
+                elif event.key == K_q:
+                    myGraph()
+
+                elif event.key == K_RETURN:
+                    active = False
+    
+    # an option to quit at entering equation or to graph
+    if done:
+        #only thing left to do is quit
+        pygame.quit()
+    else:
+        # clip rigth side of the screen (except equation)
+        screen.set_clip(width, 0, width+extraW, height-30)
+        screen.fill(white)
+        screen.set_clip(None)
+    
+
+        #graph equation cunction called
+        GraphEq(eq,k)
+    sys.exit()
+def GraphEq(eq,k):
+
+    #graphing of the equation
+    for i in range(width):
+        try:
+            x = ((width/2)-i)/k
+            y = eval(eq)
+            pos1 = ((width/2)+ x*k, height/2-y*k)
+
+            nx = x = ((width/2)-(i+1))/k
+            ny = eval(eq)
+            pos2 = ((width/2)+nx*k, (height/2)-ny*k)
+
+            
+            pygame.draw.line(screen, (0,0,255), pos1, pos2, 4)
+        except:
+            pass
+    
+
+    #clip the screen to keep  text cleen
+    screen.set_clip(width,0,width+extraW,height-30)
+    
+    #Instructions and results
+    title = font2.render("Christian's title", 1, titlecolour)
+    screen.blit(title, (width + 10, 20))
+
+    instruct = font.render("Select 'q' to start over. ", 1, black)
+    screen.blit(instruct, (width + 10, 70))
+
+    #Compute and display y-intercept
+    x = 0
+
+    try:
+        yint = eval(eq)
+        yint = round(yint,2)
+    except: yint = 'dne'
+
+    instruct = font.render("The y-intercept is at (0,%s)"%(str(yint)), 1, black)
+    screen.blit(instruct, (width + 10, 100))
+
+    if yint != 'dne':
+        instruct = font.render("Select 'y' to plot the intercept. ", 1, black)
+        screen.blit(instruct, (width + 20, 120))
+    
+
+    #Resize grid
+    instruct =  font.render("Select 's',  'm', 'l' or 'o' for gridsizes. ",1, black)
+    screen.blit(instruct, (width+10, height-70))
+
+    #Reset clip of screen
+    screen.set_clip(None)
+
+    instruct = font.render("Type in a value of x and select 'Enter' to plot the point. ", 1, (0,0,200))
+    screen.blit(instruct, (width + 20, 150))
+    #Plotting of x values
+    xValue =  []
+    xVal  =  '?'
+    yVal  = '?'
+
+
+
+    
+    # run an infinite loop to control the window
+    active = True
+    while active:
+        #clip the screen to show  x and y values
+        screen.set_clip(width+10, 150, width+extraW, 200)
+        screen.fill(white)
+        xDisplay = " ".join(xValue)
+        xDisplay =  str.replace(xDisplay, " ", "")
+        plotx = font.render("x = "+str(xDisplay),1,(0,0,200))
+        screen.blit(plotx, (width+10, 150))
+        ploty = font.render("(%s,%s)"%(str(xVal),str(yVal)),1,(0,0,200))
+        screen.blit(ploty,(width+210,150))
+        screen.set_clip(None)
+
+        pygame.display.update()
+
+        #Keyboard and mouse actions
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                active = False
+
+            #commands for starting over and their features
+            elif event.type == pygame.KEYDOWN:
+                if event.key == K_q:
+                    myGraph()
+                elif event.key == K_y:
+                    pygame.draw.circle(screen, (220,20,60), ((width/2), (height/2)-yint*k),4)
+                
+                #resize commands
+                elif event.key == K_s:
+                    k = 25
+                    graphPaper(k)
+                    GraphEq(eq,k)
+                
+                elif event.key == K_m:
+                    k = 20
+                    graphPaper(k)
+                    GraphEq(eq,k)
+                
+                elif event.key == K_l:
+                    k = 10
+                    graphPaper(k)
+                    GraphEq(eq,k)
+                
+                elif event.key == K_o:
+                    k = 5
+                    graphPaper(k)
+                    GraphEq(eq,k)
+                
+                #numbers
+                elif event.key == K_1:
+                    xValue.append("1")
+                elif event.key == K_2:
+                    xValue.append("2")
+                elif event.key == K_3:
+                    xValue.append("3")
+                elif event.key == K_4:
+                    xValue.append("4")
+                elif event.key == K_5:
+                    xValue.append("5")
+                elif event.key == K_6:
+                    xValue.append("6")
+                elif event.key == K_7:
+                    xValue.append("7")
+                elif event.key == K_8:
+                    xValue.append("8")
+                elif event.key == K_9:
+                    xValue.append("9")
+                elif event.key == K_0:
+                    xValue.append("0")
+
+                elif event.unicode == u'-':
+                    xValue.append("-")
+                
+                elif event.unicode == u'.':
+                    xValue.append(".")
+                elif event.key == K_BACKSPACE and xValue !=[]:
+                    xValue.pop()
+                elif event.key == K_RETURN:
+                    try:
+                        x = xVal = float(xDisplay)
+                        yVal = eval(eq)
+                        pygame.draw.circle(screen, (0,0,255), (width/2+x*k,height/2-yVal*k),4)
+                    except:
+                        pass
+
+
+
+    #only thing left to do is quit
+    pygame.quit()
+    sys.exit()
+
+
+
+if __name__ == "__main__":
+    frontPage()
